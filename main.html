@@ -13,7 +13,6 @@
     overflow: hidden;
     height: 100vh;
     position: relative;
-    cursor: none;
   }
   
   /* Étoiles scintillantes */
@@ -223,8 +222,7 @@
   
   // Chronomètre
   let seconds = 0;
-  let isPaused = false;
-  let pauseTimeout;
+  let resetTimeout;
   
   const chronoEl = document.getElementById('chrono');
   const statusEl = document.getElementById('status');
@@ -240,31 +238,39 @@
   }
   
   function increment() {
-    if (!isPaused) {
-      seconds++;
-      updateDisplay();
-    }
+    seconds++;
+    updateDisplay();
   }
   
   setInterval(increment, 1000);
   
-  function pauseChrono() {
-    isPaused = true;
-    statusEl.textContent = '⚠ ACTIVITÉ DÉTECTÉE ! CHRONO FIGÉ';
+  function resetChrono() {
+    // Reset le chrono à zéro
+    seconds = 0;
+    updateDisplay();
+    
+    // Change le statut
+    statusEl.textContent = '⚠ ACTIVITÉ DÉTECTÉE ! CHRONO RESET';
     statusEl.classList.add('active');
     
-    clearTimeout(pauseTimeout);
-    pauseTimeout = setTimeout(() => {
-      isPaused = false;
+    // Effet visuel sur le chrono
+    chronoEl.style.borderColor = '#f00';
+    chronoEl.style.boxShadow = '0 0 30px rgba(255, 0, 0, 0.8), inset 0 0 30px rgba(255, 0, 0, 0.3)';
+    
+    // Après 2 secondes, revient à la normale
+    clearTimeout(resetTimeout);
+    resetTimeout = setTimeout(() => {
       statusEl.textContent = '✓ TU NE FAIS RIEN... CONTINUE COMME ÇA';
       statusEl.classList.remove('active');
-    }, 3000);
+      chronoEl.style.borderColor = '#f0f';
+      chronoEl.style.boxShadow = '0 0 30px rgba(255, 0, 255, 0.5), inset 0 0 30px rgba(255, 0, 255, 0.2)';
+    }, 2000);
   }
   
-  document.addEventListener('mousemove', pauseChrono);
-  document.addEventListener('keydown', pauseChrono);
-  document.addEventListener('click', pauseChrono);
-  document.addEventListener('touchstart', pauseChrono);
+  document.addEventListener('mousemove', resetChrono);
+  document.addEventListener('keydown', resetChrono);
+  document.addEventListener('click', resetChrono);
+  document.addEventListener('touchstart', resetChrono);
   
   updateDisplay();
 </script>
